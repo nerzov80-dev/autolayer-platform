@@ -1,0 +1,32 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "autolayer-platform",
+  "main": "server/index.ts",
+  "compatibility_date": "2026-08-28",
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS"
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "autolayer-db",
+      "database_id": "732e5b8f-3033-4f84-9938-2a4b0977e666"
+    }
+  ],
+  "kv_namespaces": [
+    {
+      "binding": "KV",
+      "id": "b476caa19f5b45d48c4d5f26b732cdb1"
+    }
+  ],
+  "r2_buckets": [
+    {
+      "binding": "R2",
+      "bucket_name": "autolayer-assets"
+    }
+  ],
+  "vars": {
+    "APP_ENV": "production"
+  }
+}
