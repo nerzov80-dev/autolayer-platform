@@ -20,11 +20,9 @@ export default function App() {
         element={<AdminLoginPage />}
       />
 
-      <Route
-        path="/admin"
-        element={<AdminLayout />}
-      >
+      <Route path="/admin" element={<AdminLayout />}>
         <Route index element={<AdminDashboardPage />} />
+
         <Route
           path="clients"
           element={<AdminClientsPage />}
@@ -36,10 +34,7 @@ export default function App() {
         element={<ClientLoginPage />}
       />
 
-      <Route
-        path="/client"
-        element={<ClientLayout />}
-      >
+      <Route path="/client" element={<ClientLayout />}>
         <Route
           index
           element={<ClientDashboardPage />}
