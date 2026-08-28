@@ -66,9 +66,10 @@ export default function SetupPage() {
       }
 
       setSuccess(true);
+
       setMessage(
         data.message ||
-          "Admin account created successfully.",
+          "Admin account created successfully. You can now sign in.",
       );
 
       setEmail("");
@@ -83,6 +84,10 @@ export default function SetupPage() {
     } finally {
       setLoading(false);
     }
+  }
+
+  function goToAdminLogin() {
+    navigate("/admin/login", { replace: true });
   }
 
   return (
@@ -103,120 +108,130 @@ export default function SetupPage() {
           </p>
         </div>
 
-        <form
-          onSubmit={handleSetup}
-          className="mt-8 space-y-5"
-        >
-          <div>
-            <label
-              htmlFor="setup-email"
-              className="mb-2 block text-sm font-medium text-gray-700"
-            >
-              Admin Email
-            </label>
+        {!success ? (
+          <form
+            onSubmit={handleSetup}
+            className="mt-8 space-y-5"
+          >
+            <div>
+              <label
+                htmlFor="setup-email"
+                className="mb-2 block text-sm font-medium text-gray-700"
+              >
+                Admin Email
+              </label>
 
-            <input
-              id="setup-email"
-              type="email"
-              autoComplete="email"
-              value={email}
-              onChange={(event) =>
-                setEmail(event.target.value)
-              }
-              placeholder="admin@example.com"
-              disabled={loading || success}
-              className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm outline-none transition focus:border-gray-500 disabled:bg-gray-100"
-            />
-          </div>
-
-          <div>
-            <label
-              htmlFor="setup-password"
-              className="mb-2 block text-sm font-medium text-gray-700"
-            >
-              Password
-            </label>
-
-            <input
-              id="setup-password"
-              type="password"
-              autoComplete="new-password"
-              value={password}
-              onChange={(event) =>
-                setPassword(event.target.value)
-              }
-              placeholder="Minimum 8 characters"
-              disabled={loading || success}
-              className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm outline-none transition focus:border-gray-500 disabled:bg-gray-100"
-            />
-          </div>
-
-          <div>
-            <label
-              htmlFor="setup-confirm-password"
-              className="mb-2 block text-sm font-medium text-gray-700"
-            >
-              Confirm Password
-            </label>
-
-            <input
-              id="setup-confirm-password"
-              type="password"
-              autoComplete="new-password"
-              value={confirmPassword}
-              onChange={(event) =>
-                setConfirmPassword(event.target.value)
-              }
-              placeholder="Enter the password again"
-              disabled={loading || success}
-              className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm outline-none transition focus:border-gray-500 disabled:bg-gray-100"
-            />
-          </div>
-
-          {message && (
-            <div
-              role="alert"
-              className={`rounded-lg border px-4 py-3 text-sm ${
-                success
-                  ? "border-gray-300 bg-gray-100 text-gray-800"
-                  : "border-red-200 bg-red-50 text-red-700"
-              }`}
-            >
-              {message}
+              <input
+                id="setup-email"
+                type="email"
+                autoComplete="email"
+                value={email}
+                onChange={(event) =>
+                  setEmail(event.target.value)
+                }
+                placeholder="admin@example.com"
+                disabled={loading}
+                className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm outline-none transition focus:border-gray-500 disabled:bg-gray-100"
+              />
             </div>
-          )}
 
-          <button
-            type="submit"
-            disabled={loading || success}
-            className="w-full rounded-lg bg-gray-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            {loading
-              ? "Creating Admin..."
-              : success
-                ? "Admin Created"
+            <div>
+              <label
+                htmlFor="setup-password"
+                className="mb-2 block text-sm font-medium text-gray-700"
+              >
+                Password
+              </label>
+
+              <input
+                id="setup-password"
+                type="password"
+                autoComplete="new-password"
+                value={password}
+                onChange={(event) =>
+                  setPassword(event.target.value)
+                }
+                placeholder="Minimum 8 characters"
+                disabled={loading}
+                className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm outline-none transition focus:border-gray-500 disabled:bg-gray-100"
+              />
+            </div>
+
+            <div>
+              <label
+                htmlFor="setup-confirm-password"
+                className="mb-2 block text-sm font-medium text-gray-700"
+              >
+                Confirm Password
+              </label>
+
+              <input
+                id="setup-confirm-password"
+                type="password"
+                autoComplete="new-password"
+                value={confirmPassword}
+                onChange={(event) =>
+                  setConfirmPassword(event.target.value)
+                }
+                placeholder="Enter the password again"
+                disabled={loading}
+                className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm outline-none transition focus:border-gray-500 disabled:bg-gray-100"
+              />
+            </div>
+
+            {message && (
+              <div
+                role="alert"
+                className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+              >
+                {message}
+              </div>
+            )}
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full rounded-lg bg-gray-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {loading
+                ? "Creating Admin..."
                 : "Create Admin Account"}
-          </button>
-        </form>
+            </button>
+          </form>
+        ) : (
+          <div className="mt-8">
+            <div
+              role="status"
+              className="rounded-lg border border-green-200 bg-green-50 px-4 py-4 text-sm text-green-800"
+            >
+              <p className="font-semibold">
+                Admin account created successfully.
+              </p>
 
-        {success && (
-          <button
-            type="button"
-            onClick={() => navigate("/login")}
-            className="mt-5 w-full rounded-lg border border-gray-300 px-5 py-3 text-sm font-semibold text-gray-800 transition hover:bg-gray-50"
-          >
-            Continue to Admin Login
-          </button>
+              <p className="mt-1">
+                Your administrator account is ready.
+                Continue to the Admin Login page.
+              </p>
+            </div>
+
+            <button
+              type="button"
+              onClick={goToAdminLogin}
+              className="mt-5 w-full rounded-lg bg-gray-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-gray-800"
+            >
+              Continue to Admin Login
+            </button>
+          </div>
         )}
 
         <button
           type="button"
-          onClick={() => navigate("/")}
-          className="mt-4 w-full text-sm text-gray-500 transition hover:text-gray-900"
+          onClick={goToAdminLogin}
+          className="mt-5 w-full text-sm text-gray-500 transition hover:text-gray-900"
         >
-          Back to home
+          Go to Admin Login
         </button>
       </div>
     </div>
   );
-}
+             }
