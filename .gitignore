@@ -1,7 +1,11 @@
+# Dependencies
 node_modules/
+
+# Build output
 dist/
+
+# Local development secrets
 .dev.vars
+
+# npm lockfile
 package-lock.json
-.wrangler/
-.DS_Store
-.env
