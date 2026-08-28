@@ -2,7 +2,9 @@ import { Hono } from "hono";
 import { cors } from "hono/cors";
 
 import { login, me } from "./modules/auth/controller";
+import { setupAdmin, hasAdmin } from "./modules/auth/setup";
 import { authMiddleware, requireRole } from "./middlewares/auth";
+
 import {
   getClients,
   getClient,
@@ -10,6 +12,7 @@ import {
   putClient,
   removeClient,
 } from "./modules/clients/controller";
+
 import {
   getLandingPages,
   getLandingPage,
@@ -17,6 +20,7 @@ import {
   putLandingPage,
   deleteLandingPage,
 } from "./modules/landing-pages/controller";
+
 import { domainRouter } from "./middlewares/domain-router";
 
 type Bindings = {
@@ -55,6 +59,8 @@ app.use(
   }),
 );
 
+/* ---------------- HEALTH ---------------- */
+
 app.get("/api/health", (c) => {
   return c.json({
     success: true,
@@ -63,9 +69,89 @@ app.get("/api/health", (c) => {
   });
 });
 
+/* ---------------- INITIAL SETUP ---------------- */
+
+app.get("/api/auth/setup/status", async (c) => {
+  try {
+    const adminExists = await hasAdmin(c.env);
+
+    return c.json({
+      success: true,
+      adminExists,
+    });
+  } catch (error) {
+    return c.json(
+      {
+        success: false,
+        error:
+          error instanceof Error
+            ? error.message
+            : "Unable to check setup status.",
+      },
+      500,
+    );
+  }
+});
+
+app.post("/api/auth/setup", async (c) => {
+  try {
+    const adminExists = await hasAdmin(c.env);
+
+    if (adminExists) {
+      return c.json(
+        {
+          success: false,
+          error: "An administrator account already exists.",
+        },
+        409,
+      );
+    }
+
+    const body = await c.req.json<{
+      email?: string;
+      password?: string;
+    }>();
+
+    if (!body.email || !body.password) {
+      return c.json(
+        {
+          success: false,
+          error: "Email and password are required.",
+        },
+        400,
+      );
+    }
+
+    const admin = await setupAdmin(c.env, {
+      email: body.email,
+      password: body.password,
+    });
+
+    return c.json({
+      success: true,
+      user: admin,
+    });
+  } catch (error) {
+    return c.json(
+      {
+        success: false,
+        error:
+          error instanceof Error
+            ? error.message
+            : "Unable to create administrator account.",
+      },
+      400,
+    );
+  }
+});
+
+/* ---------------- AUTH ---------------- */
+
 app.post("/api/auth/login", login);
 
 app.get("/api/auth/me", authMiddleware, me);
+
+/* ---------------- CLIENTS ---------------- */
 
 app.get(
   "/api/clients",
@@ -102,6 +188,8 @@ app.delete(
   removeClient,
 );
 
+/* ---------------- LANDING PAGES ---------------- */
+
 app.get(
   "/api/landing-pages",
   authMiddleware,
@@ -137,7 +225,11 @@ app.delete(
   deleteLandingPage,
 );
 
+/* ---------------- DOMAIN ROUTER ---------------- */
+
 app.use("*", domainRouter);
+
+/* ---------------- FALLBACK ---------------- */
 
 app.all("*", async (c) => {
   if (c.req.path.startsWith("/api/")) {
